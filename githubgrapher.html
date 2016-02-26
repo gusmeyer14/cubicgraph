@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cubic Grapher and Solver</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script type="text/javascript">
+	//JS for drawing and calculating cubics
+var a,b,c,context,w,h,k;
+
+function CF() {
+	// getting values to do cubic formula
+	a = $("#cubicA").val();
+	b = $("#quadB").val();
+	c = $("#linC").val();
+	d = $("#constantD").val();
+	results();
+	solutions();
+	graphCubic();
+};
+
+function plotYint() {
+	context.beginPath();
+	context.fillStyle = "White";
+	context.strokeStyle = "Black";
+	context.arc(w/2,h/2-c*k,3,0,2*Math.PI);
+	context.fill();
+	context.stroke();
+};
+
+function plotXint() {
+	context.beginPath();
+	context.fillStyle = "White";
+	context.strokeStyle = "Black";
+	context.arc(w/2+x1*k,h/2,3,0,2*Math.PI);
+	context.arc(w/2+x2*k,h/2,3,0,2*Math.PI);
+	context.fill();
+	context.stroke();
+};
+
+function graphCubic () {
+for (var i = 0; i < w; i++) {
+x = (w/2-i)/k;
+y = d*1+c*x+b*Math.pow(x,2)+a*Math.pow(x,3);
+nx =(w/2-(i+1))/k;
+ny = d*1+c*nx+b*Math.pow(nx,2)+a*Math.pow(nx,3);
+context.beginPath();
+context.lineWidth = 2;
+context.strokeStyle = "Red";
+context.moveTo(w/2+x*k, h/2-y*k);
+context.lineTo(w/2+nx*k, h/2-ny*k);
+context.stroke();
+};
+};
+
+function reset() {
+	//clearing canvas and answers, redrawing grid
+	context.clearRect(0,0,w,h);
+	$("#answers").hide();
+	grid();
+}
+
+function init() {
+	canvas = document.getElementById("myCanvas");
+	context = canvas.getContext("2d");
+	w = canvas.width = 600;
+	h = canvas.height = 400;
+	k = 10;
+	$("#answers").hide();
+	grid();
+}
+
+function results() {
+// finding vertext and displaying symline and yint results
+vX = -(b*1)/(2*a);
+vY = a*Math.pow(vX,2)+b*vX+c*1;
+$("#vertex").text("Vertex is at ("+vX+","+vY+")");
+$("#yintercept").text("Y intecept is y = " + c*1);
+};
+
+function solutions() {
+// cubic solutions
+$("#answers").hide();
+$("#answers").fadeIn(1000);
+D = Math.pow(b*1,2)-4*a*c;
+if (D<0) {
+	$("#solution1").text("The solutions are imaginary (no x-intercepts).");
+	$("#solution2").text(" ");
+}
+else {
+	x1 = -(b*1)/(2*a)+Math.sqrt(D)/(2*a);
+	x2 = -(b*1)/(2*a)-Math.sqrt(D)/(2*a);
+	$("#solution1").text("One solution is at x = " + Math.round(x1*1000)/1000);
+	$("#solution2").text("Another solution is at x = " + Math.round(x2*1000)/1000);
+}
+}
+
+function grid() {
+//using the direct variation constant k, we make a grid.
+context.lineWidth=1;
+context.strokeStyle="rgba(0,0,0,.4)";
+for (var i=0; i<w/k; i++) {
+	context.beginPath();
+	context.moveTo((w/k)*(i+1),0);
+	context.lineTo((w/k)*(i+1),h);
+	context.stroke();
+} //close for
+for (var i=0; i<h/k; i++) {
+	context.beginPath();
+	context.moveTo(0,(h/k)*(i+1));
+	context.lineTo(w,(h/k)*(i+1));
+	context.stroke();
+} //close for
+// x and y axis
+context.lineWidth=3;
+context.strokeStyle="rgba(0,0,0,.8)";
+context.beginPath();
+context.moveTo(0,h/2);
+context.lineTo(w,h/2);
+context.moveTo(w/2,0);
+context.lineTo(w/2,h);
+context.stroke();
+} //close grid))
+
+function zoomIN () {
+	// zooming in with bigger k
+	context.clearRect(0,0,w,h);
+	k+=10
+	grid();
+	graphCubic;
+}
+	</script>
+	<link rel="stylesheet" type="text/css" href="cubicStyles.css"/>
+	<style type="text/css">
+#wrapper 
+{
+	width: 1200px;
+	height: 600px;
+	margin:auto;
+	background-color: blue;
+}
+
+header {
+	width: 1000px;
+	box-shadow: 10px 10px 10px black;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: green;
+	text-align: center;
+	color: white;
+}
+
+#myCanvas {
+	margin: auto;
+	border: solid;
+	background-color: #DDD;
+	margin-left: 400px;
+	margin-top: 40px;
+}
+
+#coeff {
+	margin-top: 40px;
+	margin-left: 1%;
+	float: left;
+	width: 300px;
+	position: absolute;
+	background-color: rgb(200,200,200);
+	padding: 10px;
+	border-radius: 20px;
+}
+
+#answers {
+	margin-top: 240px;
+	margin-left: 1%;
+	float: left;
+	width: 300px;
+	background-color: rgb(200,200,200);
+	padding: 10px;
+	border-radius: 20px;
+}
+	</style>
+</head>
+<body onload="init()">
+	<div id="wrapper">
+		<header>Cubic Grapher</header>
+		<div id="coeff">
+			<p class="formInfo">Coefficients go here<br>
+				a = <input size="10" type="text" id="cubicA" value="1"><br>
+				b = <input size="10" type="text" id="quadB" value="0"><br>
+				c = <input size="10" type="text" id="linC" value="0"><br>
+				d = <input size="10" type="text" id="constantD" value="0"><br>
+				<button onclick="CF()">Submit Values</button>
+				<button onclick="reset()">Reset</button><br>
+				<button onclick="plotXint()">Plot X intercepts</button>
+				<button onclick="plotYint()">Plot Y intercepts</button><br>
+				<button onclick="zoomIN()">Zoom In</button>
+			</p>
+		</div>
+		<div id="answers">
+			<span id="solution1"></span><br>
+			<span id="solution2"></span><br>
+			<span id="vertex"></span><br>
+			<span id="yintercept"></span><br>
+		</div>
+	<canvas id="myCanvas"></canvas>
+	</div>
+</body>
+</html>
